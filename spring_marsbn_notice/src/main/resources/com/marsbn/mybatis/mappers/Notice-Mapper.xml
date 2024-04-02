@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Notice-Mapper"> 
+
+
+    <sql id="search">
+        <if test="searchType == 't'.toString()">
+            and n_title like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType == 'w'.toString()">
+            and n_writer like '%'||#{keyword}||'%'
+        </if>
+        <if test="searchType == 'c'.toString()">
+            and n_content like '%'||#{keyword}||'%'
+        </if>
+    </sql>
+
+    <select id="selectSearchNoticeList" resultType="notice">
+        select * from notice
+        <where>
+            <include refid="search"/>
+        </where>
+        order by n_number desc
+    </select>
+
+    <select id="selectSearchNoticeListCount" resultType="int">
+        select count(*) from notice
+        <where>
+            <include refid="search"/>
+        </where>
+    </select>
+	
+	<select id="selectNoticeByN_number" parameterType="int" resultType="notice">
+		select * from notice
+		where n_number=#{n_number}
+	</select>
+	
+	<select id="selectNoticeSeqNext" resultType="int">
+		select notice_seq.nextval as n_number from dual
+	</select>
+	
+	<insert id="insertNotice" parameterType="notice">
+		insert into
+		notice(n_number, n_content, n_date, n_title, n_writer, n_hit) 
+		values(#{n_number}, #{n_content}, #{n_date}, #{n_title}, #{n_writer}, #{n_hit})
+	</insert>
+	
+	<update id="increaseN_hit" parameterType="int">
+		update notice 
+		set n_hit = n_hit + 1 
+		where n_number=#{n_number}
+	</update>
+	
+	<update id="updateNotice" parameterType="notice">
+	    update notice
+	    set		
+	    n_title=#{n_title}, n_writer=#{n_writer}, n_content=#{n_content}
+	    where n_number=#{n_number}
+	</update>
+
+	<delete id="deleteNotice" parameterType="notice">
+		delete from notice
+		where n_number=#{n_number}
+	</delete>
+</mapper>  
